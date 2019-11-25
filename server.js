@@ -27,11 +27,13 @@ app.post("/events", (req, res) => {
           isIn(emoji,user)
             .then((is) => {
               if (is) {
+                console.log("Emoji Violator Found")
                 send(process.env.LOGS,`<@${user}> has used an emoji in a message the wrong way! The message was \`${text}\` in channel <#${channel}>`)
                 send(channel,"This message has been removed for using a restricted emoji!",ts)
                   .then(() => {
                     send(user,`Your message \`${text}\` was taken down in violation of using the restricted emoji ${emoji}!` )
                     del(maints,channel);
+                    console.log("Handled Violation")
                   })
               }
             })
@@ -42,8 +44,10 @@ app.post("/events", (req, res) => {
       isIn(`:${reaction}:`,user)
         .then((is) => {
           if (is) {
+            console.log("Emoji Reaction Violator Found")
             send(process.env.LOGS,`<@${user}> has used an emoji in a reaction the wrong way! The emoji was :${reaction}: in channel <#${req.body.event.item.channel}>`)
             send(user,`A reaction you posted has had a restricted emoji. The admin's will be contacted. The emoji you used was :${reaction}:!`);
+            console.log("Sent Warnings")
           }
         })
 	}
