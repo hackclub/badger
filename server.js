@@ -26,11 +26,9 @@ app.post("/events", (req, res) => {
                 console.log("Sent Responses")
                   .then(() => {
                     send(user,`Your message \`${text}\` was taken down in violation of using the restricted emoji ${emoji}!` )
-                    del(req.body.event.ts,channel)
-                      .then(() => {
+                    del(req.body.event.ts,channel).then(() => {
                         console.log("Deleted the message")
-                      })
-                      .catch((err) => {
+                      }).catch((err) => {
                         console.log(err);
                       })
                   })
