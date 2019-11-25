@@ -10,11 +10,17 @@ app.get("/", (req,res) => {
 app.post("/events", (req, res) => {
   try {
     if (req.body.event.channel != "C0P5NE354") { res.end() }
-
-    if (req.body.event.type == "message" && req.body.event.text) {
-      console.log(req.body.event)
-      let {ts, text, user, channel,thread_ts} = req.body.event;
+    if (req.body.event.type == "message" && req.body.event.sybtype != "message_deleted") {
+      let {ts ,text ,user, channel,thread_ts} = req.body.event;
+      if (!user) {
+        user = req.body.event.message.user;
+        ts = req.body.event.message.ts;
+        thread_ts = req.body.event.message.thread_ts;
+        text = req.body.event.message.text;
+      }
+      let maints = ts;
       ts = thread_ts ? thread_ts : ts;
+      console.log(req.body.event)
       var emojis = text.match(regex);
       if (emojis) {
         emojis.map((emoji) => {
@@ -25,7 +31,7 @@ app.post("/events", (req, res) => {
                 send(channel,"This message has been removed for using a restricted emoji!",ts)
                   .then(() => {
                     send(user,`Your message \`${text}\` was taken down in violation of using the restricted emoji ${emoji}!` )
-                    del(req.body.event.ts,channel);
+                    del(maints,channel);
                   })
               }
             })
