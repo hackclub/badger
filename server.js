@@ -23,14 +23,10 @@ app.post("/events", (req, res) => {
                 console.log("Emoji Violator Found")
                 send(process.env.LOGS,`<@${user}> has used an emoji in a message the wrong way! The message was \`${text}\` in channel <#${channel}>`)
                 send(channel,"This message has been removed for using a restricted emoji!",ts)
-                console.log("Sent Responses")
                   .then(() => {
-                    send(user,`Your message \`${text}\` was taken down in violation of using the restricted emoji ${emoji}!` )
-                    del(req.body.event.ts,channel).then(() => {
-                        console.log("Deleted the message")
-                      }).catch((err) => {
-                        console.log(err);
-                      })
+                    send(user,`Your message \`${text}\` was taken down in violation of using the restricted emoji ${emoji}!` );
+                    del(req.body.event.ts,channel);
+                    console.log("Handled Violation")
                   })
               }
             })
