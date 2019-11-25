@@ -19,9 +19,12 @@ var isIn = (emoji,user) => {
 			view: "Grid view"
 		}).eachPage((records, fetchNextPage) => {
 			records.forEach((record) => {
-				if (record.get("Emoji Tag") == emoji != record.get("People Slack IDs").split(",").includes(user)) {
-					inside = true; 
-				}
+				if (record.get("Emoji Tag") == emoji ) {
+          if (!record.get("People Slack IDs").split(",").includes(user)) {
+					  inside = true; 
+				  }
+        }
+        
 			});
 			fetchNextPage();
 		}, (err) => {
