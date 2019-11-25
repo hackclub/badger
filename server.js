@@ -30,6 +30,9 @@ app.post("/events", (req, res) => {
                       .then(() => {
                         console.log("Deleted the message")
                       })
+                      .catch((err) => {
+                        console.log(err);
+                      })
                   })
               }
             })
