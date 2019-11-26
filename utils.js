@@ -14,6 +14,7 @@ var send = (user,text,ts) => {
 	})
 }
 var isIn = (text,user) => {
+  var emojis = [];
 	return new Promise((res,rej) => {
 		let inside = false;
 		base('Badges')
@@ -22,18 +23,18 @@ var isIn = (text,user) => {
 		}).eachPage((records, fetchNextPage) => {
 			records.forEach((record) => {
 				if (text.includes(record.get("Emoji Tag"))) {
-          			if (!record.get("People Slack IDs").split(",").includes(user)) {
-					  inside = true; 
+          if (!record.get("People Slack IDs").split(",").includes(user)) {
+					  inside = true;
+            emojis.push(record.get("Emoji Tag"))
 				 	}
-        		}
-        
+        }
 			});
 			fetchNextPage();
 		}, (err) => {
 			if (err) {
 				rej(err);
 			} else {
-				res(inside);
+				res(inside,emojis);
 			}
 		});
 	})
@@ -51,7 +52,6 @@ var del = (ts, channel) => {
 }
 
 module.exports = {
-    "regex":regex,
     "isIn":isIn,
     "send":send,
     "del":del
