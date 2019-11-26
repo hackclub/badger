@@ -3,7 +3,6 @@ var base = new Airtable({ apiKey: process.env.AIRTABLE }).base(process.env.BASE)
 var qs = require('qs');
 const axios = require("axios")
 
-var regex = /:(.*?):/g;
 
 var send = (user,text,ts) => {
 	return new Promise((res,rej) => {
@@ -14,7 +13,7 @@ var send = (user,text,ts) => {
       })
 	})
 }
-var isIn = (emoji,user) => {
+var isIn = (text,user) => {
 	return new Promise((res,rej) => {
 		let inside = false;
 		base('Badges')
@@ -22,11 +21,11 @@ var isIn = (emoji,user) => {
 			view: "Grid view"
 		}).eachPage((records, fetchNextPage) => {
 			records.forEach((record) => {
-				if (record.get("Emoji Tag") == emoji ) {
-          if (!record.get("People Slack IDs").split(",").includes(user)) {
+				if (text.includes(record.get("Emoji Tag"))) {
+          			if (!record.get("People Slack IDs").split(",").includes(user)) {
 					  inside = true; 
-				  }
-        }
+				 	}
+        		}
         
 			});
 			fetchNextPage();
