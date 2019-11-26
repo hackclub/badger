@@ -19,28 +19,21 @@ app.post("/events", (req, res) => {
         text = req.body.event.message.text;
       }
       let maints = ts;
-      ts = thread_ts ? thread_ts : ts;
-      console.log(req.body.event)
-      var emojis = text.match(regex);
-      if (emojis) {
-        emojis.map((emoji) => {
-          isIn(emoji,user)
-            .then( (is) => {
-              if (is) {
-                send(process.env.LOGS,`<@${user}> has used an emoji in a message the wrong way! The message was \`${text}\` in channel <#${channel}>`)
-                send(channel,"This message has been removed for using a restricted emoji!",ts)
-                  .then(() => {
-                    send(user,`Your message \`${text}\` was taken down in violation of using the restricted emoji ${emoji}!` )
-                    del(maints,channel);
-                  })
-                .catch((err) => {
-                  console.log(err)
-                })
-                  
-              }
+      ts = thread_ts ? thread_ts : ts
+      isIn(text,user)
+        .then( (is,emojis) => {
+          if (is) {
+            send(process.env.LOGS,`<@${user}> has used an emoji in a message the wrong way! The message was \n> ${text} \n in channel <#${channel}>`)
+            send(channel,"This message has been removed for using a restricted emoji!",ts)
+              .then(() => {
+                send(user,`Your message \n> ${text} \n was taken down in violation of using the restricted emoji ${emojis.join(" ")}!` )
+                del(maints,channel);
+              })
+            .catch((err) => {
+              console.log(err)
             })
+          }
         })
-      } 
     } else if (req.body.event.type == "reaction_added"){
       let {user, reaction} = req.body.event;
       isIn(`:${reaction}:`,user)

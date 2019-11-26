@@ -3,21 +3,18 @@ var base = new Airtable({ apiKey: process.env.AIRTABLE }).base(process.env.BASE)
 var qs = require('qs');
 const axios = require("axios")
 
-var regex = /:(.*?):/g;
 
 var send = (user,text,ts) => {
 	return new Promise((res,rej) => {
-		axios.post("https://slack.com/api/chat.postMessage",qs.stringify({"token":process.env.BOT,"channel":user,"text":text,"as_user":true,"thread_ts":ts}))
-			.then(() => {
+		axios.post("https://slack.com/api/chat.postMessage",qs.stringify({"token":process.env.OAUTH,"channel":user,"text":text,"thread_ts":ts}))
+		.then(() => {
+			console.log("the ts is: "+ts+" || and the channel is : "+user)
         res();
-      })
-      .catch((err) => {
-        console.log(err)
-        rej(err);
       })
 	})
 }
-var isIn = (emoji,user) => {
+var isIn = (text,user) => {
+  var emojis = [];
 	return new Promise((res,rej) => {
 		let inside = false;
 		base('Badges')
@@ -25,19 +22,19 @@ var isIn = (emoji,user) => {
 			view: "Grid view"
 		}).eachPage((records, fetchNextPage) => {
 			records.forEach((record) => {
-				if (record.get("Emoji Tag") == emoji ) {
+				if (text.includes(record.get("Emoji Tag"))) {
           if (!record.get("People Slack IDs").split(",").includes(user)) {
-					  inside = true; 
-				  }
+					  inside = true;
+            emojis.push(record.get("Emoji Tag"))
+				 	}
         }
-        
 			});
 			fetchNextPage();
 		}, (err) => {
 			if (err) {
 				rej(err);
 			} else {
-				res(inside);
+				res(inside,emojis);
 			}
 		});
 	})
@@ -55,7 +52,6 @@ var del = (ts, channel) => {
 }
 
 module.exports = {
-    "regex":regex,
     "isIn":isIn,
     "send":send,
     "del":del
