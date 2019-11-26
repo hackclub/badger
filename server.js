@@ -12,7 +12,7 @@ app.post("/events", (req, res) => {
     if (req.body.event.channel != "C0P5NE354") { res.end() }
     if (req.body.event.type == "message" && req.body.event.subtype != "message_deleted") {
       let {ts ,text ,user, channel,thread_ts} = req.body.event;
-      if (!user) {
+      if (!user && req.body.event.message) {
         user = req.body.event.message.user;
         ts = req.body.event.message.ts;
         thread_ts = req.body.event.message.thread_ts;
@@ -21,8 +21,9 @@ app.post("/events", (req, res) => {
       let maints = ts;
       ts = thread_ts ? thread_ts : ts
       isIn(text,user)
-        .then( (is,emojis) => {
-          if (is) {
+        .then( (emojis) => {
+          if (emojis.length > 0) {
+            console.log(emojis)
             send(process.env.LOGS,`<@${user}> has used an emoji in a message the wrong way! The message was \n> ${text} \n in channel <#${channel}>`)
             send(channel,"This message has been removed for using a restricted emoji!",ts)
               .then(() => {
