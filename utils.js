@@ -8,12 +8,9 @@ var regex = /:(.*?):/g;
 var send = (user,text,ts) => {
 	return new Promise((res,rej) => {
 		axios.post("https://slack.com/api/chat.postMessage",qs.stringify({"token":process.env.BOT,"channel":user,"text":text,"as_user":true,"thread_ts":ts}))
-			.then(() => {
+		.then(() => {
+			console.log("the ts is: "+ts+" || and the channel is : "+user)
         res();
-      })
-      .catch((err) => {
-        console.log(err)
-        rej(err);
       })
 	})
 }

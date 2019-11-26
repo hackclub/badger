@@ -26,8 +26,6 @@ app.post("/events", (req, res) => {
           isIn(emoji,user)
             .then((is) => {
               if (is) {
-                console.log(req.body.event);
-                console.log("the ts is: "+ts+" || and the channel is : "+channel)
                 send(process.env.LOGS,`<@${user}> has used an emoji in a message the wrong way! The message was \`${text}\` in channel <#${channel}>`)
                 send(channel,"This message has been removed for using a restricted emoji!",ts);
               }
