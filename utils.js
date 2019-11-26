@@ -8,7 +8,6 @@ var send = (user,text,ts) => {
 	return new Promise((res,rej) => {
 		axios.post("https://slack.com/api/chat.postMessage",qs.stringify({"token":process.env.OAUTH,"channel":user,"text":text,"thread_ts":ts}))
 		.then(() => {
-			console.log("the ts is: "+ts+" || and the channel is : "+user)
         res();
       })
 	})
@@ -34,7 +33,7 @@ var isIn = (text,user) => {
 			if (err) {
 				rej(err);
 			} else {
-				res(inside,emojis);
+				res(emojis);
 			}
 		});
 	})
