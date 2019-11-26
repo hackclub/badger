@@ -10,7 +10,7 @@ app.get("/", (req,res) => {
 app.post("/events", (req, res) => {
   try {
     if (req.body.event.channel != "C0P5NE354") { res.end() }
-    if (req.body.event.type == "message" && req.body.event.sybtype != "message_deleted") {
+    if (req.body.event.type == "message" && req.body.event.subtype != "message_deleted") {
       let {ts ,text ,user, channel,thread_ts} = req.body.event;
       if (!user) {
         user = req.body.event.message.user;
