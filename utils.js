@@ -15,7 +15,6 @@ var send = (user,text,ts) => {
 var isIn = (text,user) => {
   var emojis = [];
 	return new Promise((res,rej) => {
-		let inside = false;
 		base('Badges')
 		.select({
 			view: "Grid view"
