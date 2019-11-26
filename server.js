@@ -33,6 +33,10 @@ app.post("/events", (req, res) => {
                     send(user,`Your message \`${text}\` was taken down in violation of using the restricted emoji ${emoji}!` )
                     del(maints,channel);
                   })
+                .catch((err) => {
+                  console.log(err)
+                })
+                  
               }
             })
         })
