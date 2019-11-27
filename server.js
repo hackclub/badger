@@ -8,8 +8,8 @@ app.get("/", (req,res) => {
 });
 
 app.post("/events", (req, res) => {
+  if (req.body.event.channel == "C0P5NE354") {
   try {
-    if (req.body.event.channel != "C0P5NE354") { res.end() }
     if (req.body.event.type == "message" && req.body.event.subtype != "message_deleted") {
       let {ts ,text ,user, channel,thread_ts} = req.body.event;
       if (!user && req.body.event.message) {
@@ -47,6 +47,8 @@ app.post("/events", (req, res) => {
 	}
   } finally {
 	  res.send(req.body.challenge)
+  }} else {
+    res.send(req.body.challenge)
   }
 });
 
