@@ -38,7 +38,7 @@ app.post("/events", (req, res) => {
     } else if (req.body.event.type == "reaction_added"){
       let {user, reaction} = req.body.event;
       isIn(`:${reaction}:`,user)
-        .then((emoji) => {
+        .then((emojis) => {
           if (emojis.length > 0) {
             send(process.env.LOGS,`Grrr..... <@${user}> has been naughty and emoji in a reactoin the wrong way! The bad bad emoji was :${reaction}: in channel <#${req.body.event.item.channel}>`)
             send(user,`Grrr..... a reaction you posted has had a restricted emoji. The admin's will be contacted. The emoji you used was :${reaction}:! Grrr..... don't do this again!`);
