@@ -8,19 +8,18 @@ app.get("/", (req,res) => {
 });
 
 app.post("/events", (req, res) => {
-  if (req.body.event.type == "user_change") {
-    var {status_text, status_emoji} = req.body.event.user.profile;
-    var user = req.body.event.user.id;
-    isIn(status_emoji + " " + status_text,user)
-      .then(emojis => {
-        if (emojis.length > 0) {
-          send(user,`Grrr..... your status \n> ${status_emoji + " " + status_text} \n is in violation of using the restricted emoji ${emojis.join(" ")}! Grrr..... don't do this again! The admin's WILL be notified!` )
-          send(process.env.LOGS,`Grrr..... <@${user}> has been naughty and emoji in a status the wrong way! The bad bad status was \n> ${status_emoji + " " + status_text}`)
-          // removeStatus(user); OOF This can't be in here bc only for enterprise
-        }
-      })
-  }
-  if (req.body.event.channel == "C0P5NE354") {
+  // if (req.body.event.type == "user_change") {
+  //   var {status_text, status_emoji} = req.body.event.user.profile;
+  //   var user = req.body.event.user.id;
+  //   isIn(status_emoji + " " + status_text,user)
+  //     .then(emojis => {
+  //       if (emojis.length > 0) {
+  //         send(user,`Grrr..... your status \n> ${status_emoji + " " + status_text} \n is in violation of using the restricted emoji ${emojis.join(" ")}! Grrr..... don't do this again! The admin's WILL be notified!` )
+  //         send(process.env.LOGS,`Grrr..... <@${user}> has been naughty and emoji in a status the wrong way! The bad bad status was \n> ${status_emoji + " " + status_text}`)
+  //         // removeStatus(user); OOF This can't be in here bc only for enterprise
+  //       }
+  //     })
+  // }
   try {
     if (req.body.event.type == "message" && req.body.event.subtype != "message_deleted") {
       let {ts ,text ,user, channel,thread_ts} = req.body.event;
@@ -48,19 +47,17 @@ app.post("/events", (req, res) => {
           }
         })
     } else if (req.body.event.type == "reaction_added"){
-      let {user, reaction} = req.body.event;
-      isIn(`:${reaction}:`,user)
-        .then((emojis) => {
-          if (emojis.length > 0) {
-            send(process.env.LOGS,`Grrr..... <@${user}> has been naughty and emoji in a reactoin the wrong way! The bad bad emoji was :${reaction}: in channel <#${req.body.event.item.channel}>`)
-            send(user,`Grrr..... a reaction you posted has had a restricted emoji. The admin's will be contacted. The emoji you used was :${reaction}:! Grrr..... don't do this again!`);
-          }
-        })
+      // let {user, reaction} = req.body.event;
+      // isIn(`:${reaction}:`,user)
+      //   .then((emojis) => {
+      //     if (emojis.length > 0) {
+      //       send(process.env.LOGS,`Grrr..... <@${user}> has been naughty and emoji in a reactoin the wrong way! The bad bad emoji was :${reaction}: in channel <#${req.body.event.item.channel}>`)
+      //       send(user,`Grrr..... a reaction you posted has had a restricted emoji. The admin's will be contacted. The emoji you used was :${reaction}:! Grrr..... don't do this again!`);
+      //     }
+      //   })
 	}
   } finally {
 	  res.send(req.body.challenge)
-  }} else {
-    res.send(req.body.challenge)
   }
 });
 
