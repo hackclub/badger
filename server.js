@@ -14,7 +14,7 @@ app.post("/events", (req, res) => {
     isIn(status_emoji + " " + status_text,user)
       .then(emojis => {
         if (emojis.length > 0) {
-          send(user,`Grrr..... your status \n> ${status_emoji + " " + status_text} \n was taken down in violation of using the restricted emoji ${emojis.join(" ")}! Grrr..... don't do this again!` )
+          send(user,`Grrr..... your status \n> ${status_emoji + " " + status_text} \n is in violation of using the restricted emoji ${emojis.join(" ")}! Grrr..... don't do this again! The admin's WILL be notified!` )
           send(process.env.LOGS,`Grrr..... <@${user}> has been naughty and emoji in a status the wrong way! The bad bad status was \n> ${status_emoji + " " + status_text}`)
           // removeStatus(user); OOF This can't be in here bc only for enterprise
         }
