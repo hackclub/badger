@@ -1,13 +1,25 @@
 const express = require("express");
 const app = express();
 app.use(express.json());
-const {isIn, regex, send, del} = require("./utils");
+const {isIn, send, del, removeStatus} = require("./utils");
 
 app.get("/", (req,res) => {
 	res.send("Thanks for keeping me alive fellow policer!")
 });
 
 app.post("/events", (req, res) => {
+  if (req.body.event.type == "user_change") {
+    var {status_text, status_emoji} = req.body.event.user.profile;
+    var user = req.body.event.user.id;
+    isIn(status_emoji + " " + status_text,user)
+      .then(emojis => {
+        if (emojis.length > 0) {
+          send(user,`Grrr..... your status \n> ${status_emoji + " " + status_text} \n was taken down in violation of using the restricted emoji ${emojis.join(" ")}! Grrr..... don't do this again!` )
+          send(process.env.LOGS,`Grrr..... <@${user}> has been naughty and emoji in a status the wrong way! The bad bad status was \n> ${status_emoji + " " + status_text}`)
+          removeStatus(user);
+        }
+      })
+  }
   if (req.body.event.channel == "C0P5NE354") {
   try {
     if (req.body.event.type == "message" && req.body.event.subtype != "message_deleted") {
