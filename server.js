@@ -1,15 +1,27 @@
 const express = require("express");
 const app = express();
 app.use(express.json());
-const {isIn, regex, send, del} = require("./utils");
+const {isIn, send, del, removeStatus} = require("./utils");
 
 app.get("/", (req,res) => {
 	res.send("Thanks for keeping me alive fellow policer!")
 });
 
 app.post("/events", (req, res) => {
+  if (req.body.event.type == "user_change") {
+    var {status_text, status_emoji} = req.body.event.user.profile;
+    var user = req.body.event.user.id;
+    isIn(status_emoji + " " + status_text,user)
+      .then(emojis => {
+        if (emojis.length > 0) {
+          send(user,`Grrr..... your status \n> ${status_emoji + " " + status_text} \n was taken down in violation of using the restricted emoji ${emojis.join(" ")}! Grrr..... don't do this again!` )
+          send(process.env.LOGS,`Grrr..... <@${user}> has been naughty and emoji in a status the wrong way! The bad bad status was \n> ${status_emoji + " " + status_text}`)
+          removeStatus(user);
+        }
+      })
+  }
+  if (req.body.event.channel == "C0P5NE354") {
   try {
-    if (req.body.event.channel != "C0P5NE354") { res.end() }
     if (req.body.event.type == "message" && req.body.event.subtype != "message_deleted") {
       let {ts ,text ,user, channel,thread_ts} = req.body.event;
       if (!user && req.body.event.message) {
@@ -24,10 +36,10 @@ app.post("/events", (req, res) => {
         .then( (emojis) => {
           if (emojis.length > 0) {
             console.log(emojis)
-            send(process.env.LOGS,`<@${user}> has used an emoji in a message the wrong way! The message was \n> ${text} \n in channel <#${channel}>`)
-            send(channel,"This message has been removed for using a restricted emoji!",ts)
+            send(process.env.LOGS,`Grrr..... <@${user}> has been naughty and emoji in a message the wrong way! The bad bad message was \n> ${text} \n in the channel <#${channel}>`)
+            send(channel,"Grrr..... I smell a restricted emoji... It seems the person who used it was not authorized!",ts)
               .then(() => {
-                send(user,`Your message \n> ${text} \n was taken down in violation of using the restricted emoji ${emojis.join(" ")}!` )
+                send(user,`Grrr..... your message \n> ${text} \n was taken down in violation of using the restricted emoji ${emojis.join(" ")}! Grrr..... don't do this again!` )
                 del(maints,channel);
               })
             .catch((err) => {
@@ -40,13 +52,15 @@ app.post("/events", (req, res) => {
       isIn(`:${reaction}:`,user)
         .then((emojis) => {
           if (emojis.length > 0) {
-            send(process.env.LOGS,`<@${user}> has used an emoji in a reaction the wrong way! The emoji was :${reaction}: in channel <#${req.body.event.item.channel}>`)
-            send(user,`A reaction you posted has had a restricted emoji. The admin's will be contacted. The emoji you used was :${reaction}:!`);
+            send(process.env.LOGS,`Grrr..... <@${user}> has been naughty and emoji in a reactoin the wrong way! The bad bad emoji was :${reaction}: in channel <#${req.body.event.item.channel}>`)
+            send(user,`Grrr..... a reaction you posted has had a restricted emoji. The admin's will be contacted. The emoji you used was :${reaction}:! Grrr..... don't do this again!`);
           }
         })
 	}
   } finally {
 	  res.send(req.body.challenge)
+  }} else {
+    res.send(req.body.challenge)
   }
 });
 
