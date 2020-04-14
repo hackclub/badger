@@ -28,6 +28,7 @@ app.post("/events", (req, res) => {
         ts = req.body.event.message.ts;
         thread_ts = req.body.event.message.thread_ts;
       }
+      console.log(req.body.event)
       text = JSON.stringify(req.body.event);
       let maints = ts;
       ts = thread_ts ? thread_ts : ts
