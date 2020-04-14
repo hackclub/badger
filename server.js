@@ -38,7 +38,7 @@ app.post("/events", (req, res) => {
             console.log(emojis)
             send(process.env.LOGS, `Grrr..... <@${user}> has been naughty and emoji in a message the wrong way! The bad bad message was \n> ${text} \n in the channel <#${channel}>`)
               .then(() => {
-                send(user, `Grrr..... your message \n> ${text} \n was taken down in violation of using the restricted emoji ${emojis.join(" ")}! Grrr..... don't do this again!`)
+                send(user, `Grrr..... your message \n> ${req.body.event.text ? req.body.event.text : "Attchment sent by bot..."} \n was taken down in violation of using the restricted emoji ${emojis.join(" ")}! Grrr..... don't do this again!`)
                 del(maints, channel);
               })
               .catch((err) => {
