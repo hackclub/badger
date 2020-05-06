@@ -62,6 +62,6 @@ app.post("/events", (req, res) => {
 });
 
 
-const listener = app.listen(process.env.PORT, function () {
+const listener = app.listen(process.env.PORT, () => {
   console.log("Badger is listening on port " + listener.address().port);
 });
