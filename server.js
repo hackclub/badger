@@ -8,6 +8,7 @@ app.get("/", (req, res) => {
 });
 
 app.post("/events", (req, res) => {
+  if (process.env.EVENT_TOKEN == req.body.token) {
   // if (req.body.event.type == "user_change") {
   //   var {status_text, status_emoji} = req.body.event.user.profile;
   //   var user = req.body.event.user.id;
@@ -59,6 +60,7 @@ app.post("/events", (req, res) => {
   } finally {
     res.send(req.body.challenge)
   }
+  } else {res.sendStatus(401)}
 });
 
 
