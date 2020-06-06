@@ -1,0 +1,13 @@
+{
+  "public": true,
+  "rewrites": [
+    { "source": "/(.+)", "destination": "/api/$1" },
+    { "source": "/emojis", "destination": "/emoji" }
+  ],
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "https://github.com/hackclub/badger"
+    }
+  ]
+}
