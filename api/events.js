@@ -36,11 +36,14 @@ module.exports = async (req, res) => {
         message = event.attachments[0]
         if (!text) text = message.text
       }
-      text = JSON.stringify(event)
+      // text = JSON.stringify(event)
       if (!message && !user) return res.json({})
       const emojis = await isIn(text, user)
       console.log('MESSAGE', text, user, emojis)
       if (emojis.length > 0) {
+        console.log(
+          `Grrr… <@${user}> has been naughty and emoji in a message the wrong way! The bad bad message was \n> ${text} \n in the channel <#${channel}>`
+        )
         send(
           process.env.LOGS,
           `Grrr… <@${user}> has been naughty and emoji in a message the wrong way! The bad bad message was \n> ${text} \n in the channel <#${channel}>`
