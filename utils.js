@@ -44,11 +44,11 @@ export const removeStatus = user => {
 
 export const isIn = async (text = '', user = '') => {
   let list = await fetch(
-    'https://api2.hackclub.com/v0.1/Operations/Badges'
+    'https://airbridge.hackclub.com/v0.1/Operations/Badges?cache=true'
   ).then(resp => resp.json())
   list = list.map(({ fields }) => ({
     label: fields['Emoji Tag'] || '',
-    people: fields['People Slack IDs'].split(',') || []
+    people: (fields['People Slack IDs'] || '').split(',') || []
   }))
   const emojis = []
   list.forEach(badge => {
