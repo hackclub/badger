@@ -36,6 +36,23 @@ module.exports = async (req, res) => {
         message = event.attachments[0]
         if (!text) text = message.text
       }
+      // add block text
+      if (message.blocks) {
+        for (const block of message.blocks) {
+          if (block.type === "section") {
+            if (block.text && (block.text.type === "mrkdwn" || block.text.emoji === true)) {
+              text += block.text.text
+            }
+            if (block.fields) {
+              for (const field of block.fields) {
+                if (field.text.type === "mrkdwn" || field.text.emoji === true) {
+                  text += field.text.text
+                }
+              }
+            }
+          }
+        }
+      }
       // text = JSON.stringify(event)
       if (!message && !user) return res.json({})
       const emojis = await isIn(text, user)
