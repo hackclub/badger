@@ -25,20 +25,22 @@ module.exports = async (req, res) => {
       event.subtype !== 'message_deleted' &&
       event.subtype !== 'channel_join'
     ) {
+      let blocks = null
       let { ts, text, user, message, channel, thread_ts } = event
       if (!user && message) {
         user = message.user
         ts = message.ts
         text = message.text
         thread_ts = message.thread_ts
+        blocks = message.blocks
       }
       if (!message && event.attachments) {
         message = event.attachments[0]
         if (!text) text = message.text
       }
       // add block text
-      if (message.blocks) {
-        for (const block of message.blocks) {
+      if (blocks) {
+        for (const block of blocks) {
           if (block.type === "section") {
             if (block.text && (block.text.type === "mrkdwn" || block.text.emoji === true)) {
               text += block.text.text
