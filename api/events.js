@@ -70,7 +70,7 @@ module.exports = async (req, res) => {
         send(
           user,
           `Grrr…your message \n> ${
-            event.text || 'Attchment sent by bot…'
+            event.text || 'Attachment sent by bot…'
           } \n was taken down in violation of using the restricted emoji ${emojis.join(
             ' '
           )}! Grrr…don’t do this again!`
@@ -80,8 +80,8 @@ module.exports = async (req, res) => {
     }
     else if (event.type == 'reaction_added') {
       let { user, reaction } = event
+      console.log('REACTION', reaction, user, emojis)
       isIn(`:${reaction}:`, user).then(emojis => {
-        console.log('REACTION', reaction, user, emojis)
         if (emojis.length > 0) {
           send(
             process.env.LOGS,
