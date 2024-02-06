@@ -2,3 +2,5 @@
 .env
 shrinkwrap.yaml
 .vercel
+.env*.local
+/node_modules
