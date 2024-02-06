@@ -78,7 +78,6 @@ module.exports = async (req, res) => {
         del(ts, channel)
       }
     }
-    /*
     else if (event.type == 'reaction_added') {
       let { user, reaction } = event
       isIn(`:${reaction}:`, user).then(emojis => {
@@ -94,7 +93,6 @@ module.exports = async (req, res) => {
         }
       })
     }
-    */
   } finally {
     res.send(req.body.challenge)
   }
