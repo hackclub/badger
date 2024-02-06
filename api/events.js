@@ -81,6 +81,7 @@ module.exports = async (req, res) => {
     else if (event.type == 'reaction_added') {
       let { user, reaction } = event
       isIn(`:${reaction}:`, user).then(emojis => {
+        console.log('REACTION', reaction, user, emojis)
         if (emojis.length > 0) {
           send(
             process.env.LOGS,
