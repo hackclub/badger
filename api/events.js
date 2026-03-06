@@ -1,96 +1,97 @@
-import { isIn, send, del, removeStatus } from '../utils.js'
+import { isIn, send, del } from '../utils.js'
 
-export default async (req) => {
-  if (req.method !== 'POST') {
-    console.error('Non-POST request')
-    return Response.json({ error: 'Method not allowed, use POST' }, { status: 405 })
-  }
+export default {
+  async fetch(request) {
+    if (request.method !== 'POST') {
+      console.error('Non-POST request')
+      return Response.json({ error: 'Method not allowed, use POST' }, { status: 405 })
+    }
 
-  const body = await req.json()
+    const body = await request.json()
 
-  if (process.env.TOKEN !== body.token) {
-    console.error('Token missing')
-    console.log('Expected:', process.env.TOKEN, 'Received:', body.token)
-    return Response.json({ error: 'Token missing or incorrect' }, { status: 403 })
-  }
-  if (body.challenge && !body.event) {
-    console.log('Received challenge but no event')
-    return new Response(body.challenge)
-  }
-  try {
-    const { event } = body
-    if (
-      event.type === 'message' &&
-      event.subtype !== 'message_deleted' &&
-      event.subtype !== 'channel_join'
-    ) {
-      let blocks = null
-      let { ts, text, user, message, channel, thread_ts } = event
-      if (!user && message) {
-        user = message.user
-        ts = message.ts
-        text = message.text
-        thread_ts = message.thread_ts
-        blocks = message.blocks
-      }
-      if (!message && event.attachments) {
-        message = event.attachments[0]
-        if (!text) text = message.text
-      }
-      if (blocks) {
-        for (const block of blocks) {
-          if (block.type === "section") {
-            if (block.text && (block.text.type === "mrkdwn" || block.text.emoji === true)) {
-              text += block.text.text
-            }
-            if (block.fields) {
-              for (const field of block.fields) {
-                if (field.text.type === "mrkdwn" || field.text.emoji === true) {
-                  text += field.text.text
+    if (process.env.TOKEN !== body.token) {
+      console.error('Token missing')
+      console.log('Expected:', process.env.TOKEN, 'Received:', body.token)
+      return Response.json({ error: 'Token missing or incorrect' }, { status: 403 })
+    }
+    if (body.challenge && !body.event) {
+      console.log('Received challenge but no event')
+      return new Response(body.challenge)
+    }
+    try {
+      const { event } = body
+      if (
+        event.type === 'message' &&
+        event.subtype !== 'message_deleted' &&
+        event.subtype !== 'channel_join'
+      ) {
+        let blocks = null
+        let { ts, text, user, message, channel, thread_ts } = event
+        if (!user && message) {
+          user = message.user
+          ts = message.ts
+          text = message.text
+          thread_ts = message.thread_ts
+          blocks = message.blocks
+        }
+        if (!message && event.attachments) {
+          message = event.attachments[0]
+          if (!text) text = message.text
+        }
+        if (blocks) {
+          for (const block of blocks) {
+            if (block.type === 'section') {
+              if (block.text && (block.text.type === 'mrkdwn' || block.text.emoji === true)) {
+                text += block.text.text
+              }
+              if (block.fields) {
+                for (const field of block.fields) {
+                  if (field.text.type === 'mrkdwn' || field.text.emoji === true) {
+                    text += field.text.text
+                  }
                 }
               }
             }
           }
         }
+        if (!message && !user) return Response.json({})
+        const emojis = await isIn(text, user)
+        console.log('MESSAGE', text, user, emojis)
+        if (emojis.length > 0) {
+          console.log(
+            `Grrr… <@${user}> has been naughty and emoji in a message the wrong way! The bad bad message was \n> ${text} \n in the channel <#${channel}>`
+          )
+          send(
+            process.env.LOGS,
+            `Grrr… <@${user}> has been naughty and emoji in a message the wrong way! The bad bad message was \n> ${text} \n in the channel <#${channel}>`
+          )
+          send(
+            user,
+            `Grrr…your message \n> ${
+              event.text || 'Attachment sent by bot…'
+            } \n was taken down in violation of using the restricted emoji ${emojis.join(
+              ' '
+            )}! Grrr…don't do this again!`
+          ).catch(err => console.error(err))
+          del(ts, channel)
+        }
+      } else if (event.type === 'reaction_added') {
+        const { user, reaction } = event
+        const emojis = await isIn(`:${reaction}:`, user)
+        console.log('REACTION', reaction, user, emojis)
+        if (emojis.length > 0) {
+          send(
+            process.env.LOGS,
+            `Grrr..... <@${user}> has been naughty and emoji in a reaction the wrong way! The bad bad emoji was :${reaction}: in channel <#${event.item.channel}>`
+          )
+          send(
+            user,
+            `Grrr..... a reaction you posted has had a restricted emoji. The admins will be contacted. The emoji you used was :${reaction}:! Grrr..... don't do this again!`
+          )
+        }
       }
-      if (!message && !user) return Response.json({})
-      const emojis = await isIn(text, user)
-      console.log('MESSAGE', text, user, emojis)
-      if (emojis.length > 0) {
-        console.log(
-          `Grrr… <@${user}> has been naughty and emoji in a message the wrong way! The bad bad message was \n> ${text} \n in the channel <#${channel}>`
-        )
-        send(
-          process.env.LOGS,
-          `Grrr… <@${user}> has been naughty and emoji in a message the wrong way! The bad bad message was \n> ${text} \n in the channel <#${channel}>`
-        )
-        send(
-          user,
-          `Grrr…your message \n> ${
-            event.text || 'Attachment sent by bot…'
-          } \n was taken down in violation of using the restricted emoji ${emojis.join(
-            ' '
-          )}! Grrr…don't do this again!`
-        ).catch(err => console.error(err))
-        del(ts, channel)
-      }
+    } finally {
+      return new Response(body.challenge)
     }
-    else if (event.type == 'reaction_added') {
-      let { user, reaction } = event
-      const emojis = await isIn(`:${reaction}:`, user)
-      console.log('REACTION', reaction, user, emojis)
-      if (emojis.length > 0) {
-        send(
-          process.env.LOGS,
-          `Grrr..... <@${user}> has been naughty and emoji in a reaction the wrong way! The bad bad emoji was :${reaction}: in channel <#${event.item.channel}>`
-        )
-        send(
-          user,
-          `Grrr..... a reaction you posted has had a restricted emoji. The admins will be contacted. The emoji you used was :${reaction}:! Grrr..... don't do this again!`
-        )
-      }
-    }
-  } finally {
-    return new Response(body.challenge)
   }
 }
