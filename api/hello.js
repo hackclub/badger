@@ -1,2 +1,2 @@
-export default (res) =>
-  res.send('Thanks for keeping me alive fellow policer!')
+export default (req) =>
+  new Response('Thanks for keeping me alive fellow policer!')

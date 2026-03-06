@@ -1,21 +1,24 @@
 import { isIn, send, del, removeStatus } from '../utils.js'
 
-export default async (req, res) => {
+export default async (req) => {
   if (req.method !== 'POST') {
     console.error('Non-POST request')
-    return res.status(405).json({ error: 'Method not allowed, use POST' })
+    return Response.json({ error: 'Method not allowed, use POST' }, { status: 405 })
   }
-  if (process.env.TOKEN !== req.body.token) {
+
+  const body = await req.json()
+
+  if (process.env.TOKEN !== body.token) {
     console.error('Token missing')
-    console.log('Expected:', process.env.TOKEN, 'Received:', req.body.token)
-    return res.status(403).json({ error: 'Token missing or incorrect' })
+    console.log('Expected:', process.env.TOKEN, 'Received:', body.token)
+    return Response.json({ error: 'Token missing or incorrect' }, { status: 403 })
   }
-  if (req.body.challenge && !req.body.event) {
+  if (body.challenge && !body.event) {
     console.log('Received challenge but no event')
-    return res.send(req.body.challenge)
+    return new Response(body.challenge)
   }
   try {
-    const { event } = req.body
+    const { event } = body
     if (
       event.type === 'message' &&
       event.subtype !== 'message_deleted' &&
@@ -50,7 +53,7 @@ export default async (req, res) => {
           }
         }
       }
-      if (!message && !user) return res.json({})
+      if (!message && !user) return Response.json({})
       const emojis = await isIn(text, user)
       console.log('MESSAGE', text, user, emojis)
       if (emojis.length > 0) {
@@ -88,6 +91,6 @@ export default async (req, res) => {
       }
     }
   } finally {
-    res.send(req.body.challenge)
+    return new Response(body.challenge)
   }
 }

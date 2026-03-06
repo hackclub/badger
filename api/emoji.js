@@ -1,9 +1,12 @@
 import { getEmoji } from '../utils.js'
 
-export default (res) =>
-  getEmoji()
-    .then(({ emoji }) => {
-      console.log(`Got ${Object.keys(emoji || {}).length} emoji`)
-      return res.json(emoji)
-    })
-    .catch(error => console.error(error) || res.status(500).json({ error }))
+export default async (req) => {
+  try {
+    const { emoji } = await getEmoji()
+    console.log(`Got ${Object.keys(emoji || {}).length} emoji`)
+    return Response.json(emoji)
+  } catch (error) {
+    console.error(error)
+    return Response.json({ error }, { status: 500 })
+  }
+}
