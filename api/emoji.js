@@ -1,6 +1,6 @@
-const { getEmoji } = require('../utils')
+import { getEmoji } from '../utils.js'
 
-module.exports = (req, res) =>
+export default (res) =>
   getEmoji()
     .then(({ emoji }) => {
       console.log(`Got ${Object.keys(emoji || {}).length} emoji`)
